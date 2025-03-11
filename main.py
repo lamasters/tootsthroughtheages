@@ -91,4 +91,4 @@ def main(context):
     post_toot(toot, event, year, url)
     context.log("Posted toot")
 
-    return context.res.empty()
+    return context.res.json({}, statusCode=200)
