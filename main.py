@@ -5,7 +5,6 @@ from datetime import datetime
 from typing import Dict, Tuple
 
 import requests
-from mock import MagicMock
 from openai import OpenAI
 
 BANNED_WORDS = ["kill", "suicide", "murder", "hanged", "massacre"]
@@ -72,7 +71,7 @@ def get_toot(event: str) -> str:
     return res.choices[0].message.content
 
 
-def post_toot(toot: str, event: str, year: str, page_url: str, mock: bool) -> None:
+def post_toot(toot: str, event: str, year: str, page_url: str) -> None:
     date = datetime.now().strftime("%b %d")
     url = "https://techhub.social/api/v1/statuses"
 
@@ -81,24 +80,15 @@ def post_toot(toot: str, event: str, year: str, page_url: str, mock: bool) -> No
 
     params = {"status": f"{toot}\n\n{date}, {year} - {event}\n{page_url}"}
 
-    if not mock:
-        requests.post(url, headers=auth, data=params)
-    else:
-        print(params)
+    requests.post(url, headers=auth, data=params)
 
 
-def main(context, mock: bool = False):
+def main(context):
     event, year, url = get_historical_event()
     context.log(f"Got historical event")
     toot = get_toot(event)
     context.log("Got toot")
-    post_toot(toot, event, year, url, mock)
+    post_toot(toot, event, year, url)
     context.log("Posted toot")
 
     return context.res.empty()
-
-
-if __name__ == "__main__":
-    context = MagicMock()
-    context.log = print
-    main(context, True)
