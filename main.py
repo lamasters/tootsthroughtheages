@@ -8,13 +8,13 @@ import requests
 from mock import MagicMock
 from openai import OpenAI
 
-BANNED_WORDS = ["kill", "suicide", "murder", "hanged"]
+BANNED_WORDS = ["kill", "suicide", "murder", "hanged", "massacre"]
 
 
 def filter_events(event: Dict):
     text = event["text"]
     words = text.lower().split(" ")
-    return not any(banned in word for word in words for banned in BANNED_WORDS)
+    return not any(word.startswith(banned) for word in words for banned in BANNED_WORDS)
 
 
 def get_historical_event() -> Tuple[str, str, str]:
@@ -57,7 +57,7 @@ def get_toot(event: str) -> str:
     api_key = os.environ.get("OPENAI_API_KEY")
     client = OpenAI(api_key=api_key)
     res = client.chat.completions.create(
-        model="gpt-3.5-turbo",
+        model="gpt-4o-mini",
         messages=[
             {
                 "role": "system",
